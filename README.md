@@ -1,90 +1,103 @@
-﻿# EDOG 狗端固件（edog_project）
+﻿<div align="center">
 
-**软通动力通晓开发板（RK2206）** + OpenHarmony LiteOS 上的 EDOG 四足控制工程（12DOF 步态、华为云 IoTDA MQTT、舵机与运行时调参）。
+# 🐕 EDOG Firmware · edog_project
 
-主仓库：[Edog_powered_by_rk2206](https://github.com/yangzhiyong3508/Edog_powered_by_rk2206)
+**软通动力通晓开发板（RK2206）** · OpenHarmony LiteOS · 12DOF
 
-> 硬件平台：软通动力（iSoftStone）**通晓**开发板，SoC 为 RK2206（vendor 路径常见为 `isoftstone/rk2206`）。  
-> 源码对应 OpenHarmony 工程中的 `edog_project` 模块。
+[![Board](https://img.shields.io/badge/Board-通晓%20RK2206-0ea5e9?style=for-the-badge)](https://github.com/yangzhiyong3508/edog_project_docker)
+[![OS](https://img.shields.io/badge/OS-OpenHarmony%20LiteOS-black?style=for-the-badge)](https://github.com/yangzhiyong3508/edog_project_docker)
+[![DOF](https://img.shields.io/badge/Motion-12DOF%20Gait-8b5cf6?style=for-the-badge)](https://github.com/yangzhiyong3508/edog_project_docker)
 
-## 功能概览
+<p><b>从 MQTT 命令到四条腿落地——机载运动栈在这里。</b></p>
 
-- Wi‑Fi STA + MQTT 连接华为云 IoTDA  
-- 标准命令 `motion_control`（trot / turn / stop / `*_coze` 有限步等）  
-- 设备属性：机身高度差、髋收展、腿长、`speed_level` 等 runtime 调参  
-- 12DOF 步态生成与逆解（`12_DOF_Version/`）  
-- 工具脚本与契约测试（`tools/test_12dof_*.py`）  
+</div>
 
-## 目录结构
+---
 
+## ✨ 能力清单
+
+| | 模块 | 内容 |
+|:---:|:---|:---|
+| 📶 | 连接 | Wi‑Fi STA + 华为云 IoTDA MQTT |
+| 📨 | 命令 | `motion_control`：trot / 转向 / stop / `*_coze` 有限步 |
+| 🎛️ | 属性 | 机身高度差、髋收展、腿长、`speed_level` … |
+| 🦴 | 运动 | 12DOF 步态生成 + 逆解（`12_DOF_Version/`） |
+| 🧪 | 测试 | `tools/test_12dof_*.py` 契约与回归 |
+
+```mermaid
+flowchart TB
+  CLOUD[☁️ IoTDA] -->|MQTT cmd/props| FW[edog_project]
+  FW --> GAIT[12DOF 步态]
+  GAIT --> IK[逆解]
+  IK --> SERVO[舵机输出]
 ```
+
+---
+
+## 🗂️ 目录结构
+
+```text
 Docker_Edog/
 ├── BUILD.gn
-├── include/                 # edog_config.h、本地配置 example
-├── src/                     # main、wifi_mqtt_task
-├── utils/                   # iot、motion、servo、mqtt、wifi
-├── 12_DOF_Version/          # 12 自由度步态与运动学
-└── tools/                   # 校验脚本与单元风格测试
+├── include/              # edog_config · local example
+├── src/                  # main · wifi_mqtt_task
+├── utils/                # iot · motion · servo · mqtt · wifi
+├── 12_DOF_Version/       # 步态与运动学
+└── tools/                # 校验脚本
 ```
 
-## 本地密钥配置（必读）
+硬件与工程路径：软通动力（iSoftStone）通晓开发板，源码对应  
 
-**不要提交** `edog_config.local.h`。
+`vendor/isoftstone/rk2206/samples/edog_project`
+
+---
+
+## 🔑 本地配置（必做）
 
 ```bash
 cp include/edog_config.local.example.h include/edog_config.local.h
-# 编辑填入：
-# - WiFi SSID/密码
-# - IoTDA 设备 ID / MQTT 用户名 / 设备密钥
-# - IoTDA 设备侧接入地址
 ```
 
-`.gitignore` 已忽略 `edog_config.local.h`。
+填写 Wi‑Fi、IoTDA 设备 ID / MQTT 用户名 / 设备密钥 / 接入地址。  
 
-## 编译环境
+⛔ **`edog_config.local.h` 禁止提交**（已 gitignore）。
 
-推荐使用 OpenHarmony LiteOS 官方/课程 Docker 镜像，在完整源码树中编译：
+---
 
-```text
-vendor/isoftstone/rk2206/samples/edog_project
-```
+## 🔨 编译提示
 
-将本仓库内容同步到上述路径后，按软通动力通晓（RK2206）开发板文档执行整编，产出：
-
-- `liteos.bin` / 烧录镜像  
-- 可用桌面目录 `EDOG_12_DOF_Image` 中的打包脚本作参考  
-
-### 从 Docker 更新源码（示例）
+在 OpenHarmony LiteOS 完整树 + Docker/本地工具链中编译本模块，按通晓（RK2206）开发板文档产出烧录镜像。
 
 ```bash
-docker start <your_openharmony_container>
-docker cp <container>:/home/openharmony/.../samples/edog_project/. ./
+# 若从容器拷贝源码
+docker cp <container>:/path/to/samples/edog_project/. ./
 ```
 
-## 与云端/App 约定
+---
+
+## 🧪 测试
+
+```bash
+python tools/test_12dof_gait_ik.py
+# 更多：tools/test_12dof_*.py
+```
+
+---
+
+## 🔗 云端与 App
 
 - 服务 ID：`Edog`  
-- 命令：`motion_control`，paras 含 `command`、`step_length_m`、`step_height_m` 等  
-- 属性：`front/rear_body_height_delta_mm`、`speed_level`、髋角、腿长等  
-- 后端下发见 [SpringBoot](https://github.com/yangzhiyong3508/SpringBoot) 的 `RobotMotionService` / `DogDebugService`  
+- 命令 / 属性协议与 [SpringBoot](https://github.com/yangzhiyong3508/SpringBoot) 的 `RobotMotionService`、`DogDebugService` 对齐  
 
-## 测试
+| 端 | 链接 |
+|----|------|
+| 主仓 | [Edog_powered_by_rk2206](https://github.com/yangzhiyong3508/Edog_powered_by_rk2206) |
+| 后端 | [SpringBoot](https://github.com/yangzhiyong3508/SpringBoot) |
+| App | [Application](https://github.com/yangzhiyong3508/Application) |
+| 图传 | [ESP32](https://github.com/yangzhiyong3508/ESP32) |
 
-```bash
-# 在已安装 Python 的环境中
-python tools/test_12dof_gait_ik.py
-# 更多 test_12dof_*.py 见 tools/
-```
+<div align="center">
 
-## 安全
+🦿 调得动 · 走得稳 · 跟得上
 
-- 禁止提交 MQTT 设备密钥、WiFi 密码、证书  
-- 仅提交 `edog_config.local.example.h`  
-- 烧录用 `.img` / `.bin` 默认忽略  
-
-## 相关仓库
-
-- 后端：[SpringBoot](https://github.com/yangzhiyong3508/SpringBoot)  
-- App：[Application](https://github.com/yangzhiyong3508/Application)  
-- 图传：[ESP32](https://github.com/yangzhiyong3508/ESP32)  
-- 视觉：[DeepLearning](https://github.com/yangzhiyong3508/DeepLearning)  
+</div>

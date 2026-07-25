@@ -1,103 +1,104 @@
 ﻿<div align="center">
 
-# 🐕 EDOG Firmware · edog_project
+# EDOG Firmware · edog_project
 
-**软通动力通晓开发板（RK2206）** · OpenHarmony LiteOS · 12DOF
+**软通动力通晓开发板（RK2206）** · OpenHarmony LiteOS · 完整机载工程
 
 [![Board](https://img.shields.io/badge/Board-通晓%20RK2206-0ea5e9?style=for-the-badge)](https://github.com/yangzhiyong3508/edog_project_docker)
-[![OS](https://img.shields.io/badge/OS-OpenHarmony%20LiteOS-black?style=for-the-badge)](https://github.com/yangzhiyong3508/edog_project_docker)
-[![DOF](https://img.shields.io/badge/Motion-12DOF%20Gait-8b5cf6?style=for-the-badge)](https://github.com/yangzhiyong3508/edog_project_docker)
-
-<p><b>从 MQTT 命令到四条腿落地——机载运动栈在这里。</b></p>
+[![Modules](https://img.shields.io/badge/Modules-WiFi%20%7C%20MQTT%20%7C%20IoT%20%7C%2012DOF-8b5cf6?style=for-the-badge)](https://github.com/yangzhiyong3508/edog_project_docker)
 
 </div>
 
 ---
 
-## ✨ 能力清单
+## 本仓库包含什么（完整模块，不只是步态）
 
-| | 模块 | 内容 |
-|:---:|:---|:---|
-| 📶 | 连接 | Wi‑Fi STA + 华为云 IoTDA MQTT |
-| 📨 | 命令 | `motion_control`：trot / 转向 / stop / `*_coze` 有限步 |
-| 🎛️ | 属性 | 机身高度差、髋收展、腿长、`speed_level` … |
-| 🦴 | 运动 | 12DOF 步态生成 + 逆解（`12_DOF_Version/`） |
-| 🧪 | 测试 | `tools/test_12dof_*.py` 契约与回归 |
+| 模块 | 路径 | 说明 |
+|------|------|------|
+| 入口 | `src/main.c` | 启动、任务创建 |
+| WiFi + MQTT 任务 | `src/wifi_mqtt_task.c` · `include/wifi_mqtt_task.h` | 联网与云端会话任务 |
+| WiFi 工具 | `utils/src/wifi_tool.c` · `utils/include/wifi_tool.h` | STA/配网等 |
+| WiFi Portal 页 | `utils/src/wifi_portal_page.h` | 配网页面资源 |
+| MQTT | `utils/src/mqtt_connect.c` · `utils/include/mqtt_connect.h` | MQTT 连接封装 |
+| IoT 协议/上报 | `utils/src/iot.c` · `utils/include/iot.h` | 华为云 IoTDA 消息与属性 |
+| IoT 命令处理 | `utils/src/iot_control.c` · `utils/include/iot_control.h` | `motion_control` 等命令解析与入队 |
+| 舵机 | `utils/src/servo_control.c` · `utils/include/servo_control.h` | PWM/舵机输出 |
+| I2C | `utils/src/i2c_bus_guard.c` | 总线保护 |
+| IMU | `utils/src/mpu6050_motion_light.c` | MPU6050 轻量姿态 |
+| 任务工具 | `utils/src/task_util.c` | 任务辅助 |
+| 8DOF 遗留步态 | `utils/src/gait_generate.c` · `motion_utils.c` | 兼容/参考实现 |
+| **12DOF 步态** | `12_DOF_Version/src/*` | 当前主用步态与逆解 |
+| 配置 | `include/edog_config.h` | 编译期配置 |
+| 本地密钥模板 | `include/edog_config.local.example.h` | WiFi/MQTT 密钥（复制为 `.local.h`，勿提交） |
+| 构建 | `BUILD.gn` | 静态库 `edog_project` 源文件列表 |
+| 测试脚本 | `tools/` | 步态/MQTT/WiFi 等契约测试 |
 
-```mermaid
-flowchart TB
-  CLOUD[☁️ IoTDA] -->|MQTT cmd/props| FW[edog_project]
-  FW --> GAIT[12DOF 步态]
-  GAIT --> IK[逆解]
-  IK --> SERVO[舵机输出]
-```
-
----
-
-## 🗂️ 目录结构
+`BUILD.gn` 已编入的源文件：
 
 ```text
-Docker_Edog/
-├── BUILD.gn
-├── include/              # edog_config · local example
-├── src/                  # main · wifi_mqtt_task
-├── utils/                # iot · motion · servo · mqtt · wifi
-├── 12_DOF_Version/       # 步态与运动学
-└── tools/                # 校验脚本
+src/main.c
+src/wifi_mqtt_task.c
+utils/src/servo_control.c
+utils/src/i2c_bus_guard.c
+utils/src/mpu6050_motion_light.c
+utils/src/task_util.c
+utils/src/wifi_tool.c
+utils/src/iot.c
+utils/src/iot_control.c
+utils/src/mqtt_connect.c
+12_DOF_Version/src/gait_generate_12dof.c
+12_DOF_Version/src/motion_utils_12dof.c
 ```
-
-硬件与工程路径：软通动力（iSoftStone）通晓开发板，源码对应  
-
-`vendor/isoftstone/rk2206/samples/edog_project`
 
 ---
 
-## 🔑 本地配置（必做）
+## 目录树
+
+```text
+edog_project/
+├── BUILD.gn
+├── include/
+│   ├── edog_config.h
+│   ├── edog_config.local.example.h
+│   ├── utils.h
+│   └── wifi_mqtt_task.h
+├── src/
+│   ├── main.c
+│   └── wifi_mqtt_task.c
+├── utils/
+│   ├── include/          # iot · iot_control · mqtt · wifi · servo · ...
+│   └── src/              # 同上对应 .c
+├── 12_DOF_Version/
+│   ├── include/
+│   └── src/
+└── tools/                # 主机侧测试脚本
+```
+
+---
+
+## 本地密钥
 
 ```bash
 cp include/edog_config.local.example.h include/edog_config.local.h
+# 填写 WiFi / IoTDA 设备三元组与接入地址
 ```
 
-填写 Wi‑Fi、IoTDA 设备 ID / MQTT 用户名 / 设备密钥 / 接入地址。  
-
-⛔ **`edog_config.local.h` 禁止提交**（已 gitignore）。
+`edog_config.local.h` **禁止提交**。
 
 ---
 
-## 🔨 编译提示
+## 编译
 
-在 OpenHarmony LiteOS 完整树 + Docker/本地工具链中编译本模块，按通晓（RK2206）开发板文档产出烧录镜像。
+放入 OpenHarmony 工程：
 
-```bash
-# 若从容器拷贝源码
-docker cp <container>:/path/to/samples/edog_project/. ./
-```
+`vendor/isoftstone/rk2206/samples/edog_project`
 
----
-
-## 🧪 测试
-
-```bash
-python tools/test_12dof_gait_ik.py
-# 更多：tools/test_12dof_*.py
-```
+按通晓（RK2206）开发板文档整编烧录。
 
 ---
 
-## 🔗 云端与 App
+## 相关仓库
 
-- 服务 ID：`Edog`  
-- 命令 / 属性协议与 [SpringBoot](https://github.com/yangzhiyong3508/SpringBoot) 的 `RobotMotionService`、`DogDebugService` 对齐  
-
-| 端 | 链接 |
-|----|------|
-| 主仓 | [Edog_powered_by_rk2206](https://github.com/yangzhiyong3508/Edog_powered_by_rk2206) |
-| 后端 | [SpringBoot](https://github.com/yangzhiyong3508/SpringBoot) |
-| App | [Application](https://github.com/yangzhiyong3508/Application) |
-| 图传 | [ESP32](https://github.com/yangzhiyong3508/ESP32) |
-
-<div align="center">
-
-🦿 调得动 · 走得稳 · 跟得上
-
-</div>
+- 主仓：https://github.com/yangzhiyong3508/Edog_powered_by_rk2206  
+- 后端：https://github.com/yangzhiyong3508/SpringBoot  
+- App：https://github.com/yangzhiyong3508/Application  

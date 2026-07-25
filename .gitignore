@@ -1,0 +1,40 @@
+# Local device / WiFi / MQTT secrets
+edog_config.local.h
+**/edog_config.local.h
+*.local.h
+!edog_config.local.example.h
+!**/edog_config.local.example.h
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+secrets/
+wifi_mqtt_secrets.*
+
+# Build artifacts / images
+*.img
+*.bin
+*.o
+*.a
+*.so
+out/
+output/
+build/
+.repo/
+
+# Backups
+*.bak
+*.bak_*
+*.orig
+
+# IDE / OS / python cache in tools
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+tools/__pycache__/
+.git/

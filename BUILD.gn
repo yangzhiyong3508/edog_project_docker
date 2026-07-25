@@ -1,0 +1,52 @@
+# Copyright (c)  2024 iSoftStone Education Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+static_library("edog_project") {
+    sources = [
+        "./src/main.c",
+        "./src/wifi_mqtt_task.c",
+        "./utils/src/servo_control.c",
+        "./utils/src/i2c_bus_guard.c",
+        "./utils/src/mpu6050_motion_light.c",
+        "./12_DOF_Version/src/gait_generate_12dof.c",
+        "./12_DOF_Version/src/motion_utils_12dof.c",
+        "./utils/src/task_util.c",
+        "./utils/src/wifi_tool.c",
+        "./utils/src/iot.c",
+        "./utils/src/iot_control.c",
+        "./utils/src/mqtt_connect.c",
+    ]
+
+    include_dirs = [
+        "//utils/native/lite/include",
+        "include",
+        "./12_DOF_Version/include",
+        "//base/iot_hardware/peripheral/interfaces/kits",
+        "./utils/include",
+        "//kernel/liteos_m/components/shell/include",
+        "//device/rockchip/rk2206/adapter/include",
+        "//device/rockchip/rk2206/sdk_liteos/board/include",
+        "//device/rockchip/hardware/lib/hal/inc",
+        "//device/rockchip/hardware/lib/CMSIS/Device/RK2206/Include/",
+        "//third_party/cJSON",
+        "//third_party/musl/porting/liteos_m/kernel/include",
+        "//third_party/paho_mqtt/MQTTPacket/src",
+        "//third_party/paho_mqtt/MQTTClient-C/src",
+    ]
+
+    deps = [
+        "//device/rockchip/hardware:hardware",
+        "//utils/native/lite/kv_store:kv_store",
+    ]
+}

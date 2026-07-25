@@ -1,10 +1,11 @@
-# EDOG 狗端固件（edog_project）
+﻿# EDOG 狗端固件（edog_project）
 
-小凌派 **RK2206** + OpenHarmony LiteOS 上的 EDOG 四足控制工程（12DOF 步态、华为云 IoTDA MQTT、舵机与运行时调参）。
+**软通动力通晓开发板（RK2206）** + OpenHarmony LiteOS 上的 EDOG 四足控制工程（12DOF 步态、华为云 IoTDA MQTT、舵机与运行时调参）。
 
 主仓库：[Edog_powered_by_rk2206](https://github.com/yangzhiyong3508/Edog_powered_by_rk2206)
 
-> 源码来自 OpenHarmony 编译 Docker / 本地 export 的 `edog_project` 模块。
+> 硬件平台：软通动力（iSoftStone）**通晓**开发板，SoC 为 RK2206（vendor 路径常见为 `isoftstone/rk2206`）。  
+> 源码对应 OpenHarmony 工程中的 `edog_project` 模块。
 
 ## 功能概览
 
@@ -48,7 +49,7 @@ cp include/edog_config.local.example.h include/edog_config.local.h
 vendor/isoftstone/rk2206/samples/edog_project
 ```
 
-将本仓库内容同步到上述路径后，按小凌派/RK2206 文档执行整编，产出：
+将本仓库内容同步到上述路径后，按软通动力通晓（RK2206）开发板文档执行整编，产出：
 
 - `liteos.bin` / 烧录镜像  
 - 可用桌面目录 `EDOG_12_DOF_Image` 中的打包脚本作参考  
